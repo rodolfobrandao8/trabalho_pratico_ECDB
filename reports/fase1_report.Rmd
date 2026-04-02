@@ -149,36 +149,260 @@ Por fim, foi aplicada uma transformação logarítmica (log2), com o objetivo de
 source("../scripts/04_merge_data.R")
 ```
 
-Nesta etapa foi realizada a integração dos dados clínicos e da matriz de expressão génica. Inicialmente, os dados clínicos ao nível do paciente e da amostra foram combinados com base no identificador do paciente (PATIENT_ID), criando um dataset clínico unificado .
+Nesta etapa foi realizada a integração dos dados clínicos e da matriz de expressão génica. 
+Inicialmente, os dados clínicos ao nível do paciente e da amostra foram combinados com 
+base no identificador do paciente (PATIENT_ID), criando um dataset clínico unificado .
 
-De seguida, os identificadores das amostras na matriz de expressão foram ajustados para garantir consistência de formato, permitindo a correspondência com os identificadores presentes nos dados clínicos. Foram então identificadas as amostras comuns entre os dois datasets.
+De seguida, os identificadores das amostras na matriz de expressão foram ajustados 
+para garantir consistência de formato, permitindo a correspondência com os identificadores 
+presentes nos dados clínicos. Foram então identificadas as amostras comuns entre os dois datasets.
 
-A matriz de expressão génica e o dataset clínico foram filtrados de forma a manter apenas essas amostras em comum. Posteriormente, foi assegurada a correta correspondência entre ambos através do alinhamento da ordem das amostras.
+A matriz de expressão génica e o dataset clínico foram filtrados de forma a manter 
+apenas essas amostras em comum. Posteriormente, foi assegurada a correta correspondência 
+entre ambos através do alinhamento da ordem das amostras.
 
-Por fim, foram realizadas verificações de consistência, garantindo que os identificadores das amostras coincidiam entre os dois datasets e confirmando as dimensões finais dos dados integrados, prontos para análise.
+Por fim, foram realizadas verificações de consistência, garantindo que os identificadores 
+das amostras coincidiam entre os dois datasets e confirmando as dimensões finais dos dados 
+integrados, prontos para análise.
 
 ## Exploração Estatistica 
 
+De forma a explorar o conjunto de dados de forma sistemática, foi delineada uma
+estratégia de análise integrada que combina variáveis clínicas, moleculares e de
+expressão génica, com o objetivo de caracterizar a coorte em estudo e investigar
+possíveis associações entre estas diferentes dimensões.
+
+Numa primeira fase, foi realizada uma análise descritiva das variáveis clínicas e
+demográficas, nomeadamente idade, sexo e estádio tumoral (AJCC). Estas variáveis
+permitem caracterizar a população em estudo, fornecendo um contexto essencial para a
+interpretação dos resultados subsequentes. Adicionalmente, foi analisada a variável de
+sobrevivência global (OS_MONTHS), enquanto indicador clínico relevante do
+prognóstico dos pacientes.
+
+Paralelamente, foram exploradas variáveis moleculares associadas ao tumor, incluindo o
+Tumor Mutational Burden (TMB), o Aneuploidy Score e o MSI_SCORE_MANTIS.
+Estas métricas refletem diferentes mecanismos de instabilidade genómica, permitindo
+caracterizar a heterogeneidade biológica entre amostras.
+
+Numa segunda etapa, foram analisadas as relações entre variáveis clínicas e
+moleculares, com particular enfoque na idade, no sexo e no estádio tumoral. Esta análise
+teve como objetivo avaliar se características clínicas estão associadas a alterações na
+biologia tumoral, permitindo identificar possíveis padrões ou tendências entre estas
+dimensões.
+
+Relativamente aos dados de expressão génica, foi realizada uma análise exploratória
+através de métodos de redução de dimensionalidade, nomeadamente a análise de
+componentes principais (PCA), com o objetivo de identificar padrões globais de
+variação e possíveis agrupamentos entre amostras.
+
+Adicionalmente, foi conduzida uma análise de expressão diferencial entre grupos de
+interesse, recorrendo a modelos lineares ajustados a dados previamente normalizados.
+Esta abordagem permitiu identificar genes diferencialmente expressos, evidenciados
+através de representações como o volcano plot, que integra simultaneamente a
+magnitude da diferença de expressão e a sua significância estatística.
+
+Por fim, os genes diferencialmente expressos foram utilizados em análises de
+enriquecimento funcional, nomeadamente KEGG, com o objetivo de identificar
+processos biológicos e vias moleculares relevantes associados às diferenças observadas.
+Esta abordagem permite contextualizar os resultados ao nível funcional, contribuindo
+para uma melhor compreensão dos mecanismos biológicos subjacentes
+
 ```{r}
-source("../scripts/aa.R")
+source("../scripts/05_exploratory_analysis.R")
 ```
-Observa-se uma maior predominância de pacientes nos estádios iniciais (IA e IB), enquanto os estádios mais avançados apresentam menor representação. Esta distribuição sugere um possível desequilíbrio no dataset, o que deve ser considerado na interpretação dos resultados.
+### Análises dos gráficos
+#### Distribuição dos estádios do cancro
+
+Observa-se uma distribuição assimétrica dos estádios tumorais, com maior concentração
+de pacientes nos estádios iniciais (Stage IA e IB). Os estádios intermédios (IIA, IIB,
+IIIA) apresentam frequências moderadas, enquanto os estádios mais avançados (IIIB e
+IV) são menos representados. Esta distribuição sugere um possível viés de amostragem
+ou diagnóstico precoce predominante.
+
+#### Distribuição por sexo
+
+A variável sexo apresenta uma distribuição relativamente equilibrada entre os grupos,
+com ligeira predominância de pacientes do sexo feminino. Este equilíbrio reduz o risco
+de viés associado ao sexo em análises comparativas.
+
+#### Distribuição da idade dos pacientes
+
+A distribuição da idade apresenta uma forma aproximadamente unimodal, centrada
+entre os 60 e 75 anos, com ligeira assimetria à direita. A presença de valores extremos
+(idades mais elevadas) é limitada, sugerindo uma dispersão moderada. Este padrão é
+consistente com a epidemiologia do cancro do pulmão, sendo a idade uma variável
+contínua relevante para análise prognóstica.
+
+#### Boxplot da idade
+
+O boxplot da idade revela uma mediana situada aproximadamente nos 65 anos, com
+intervalo interquartil concentrado entre cerca de 58 e 72 anos. Observa-se uma
+dispersão moderada e ausência de outliers extremos significativos, indicando uma
+distribuição relativamente estável. A simetria aproximada sugere que a média e a
+mediana são próximas, reforçando a consistência da variável.
+
+#### Distribuição de OS_MONTHS
+
+A variável OS_MONTHS apresenta uma distribuição fortemente assimétrica à direita,
+com elevada concentração de observações em valores baixos e uma cauda longa para
+valores elevados. Este padrão é típico de dados de sobrevivência, refletindo a presença
+de variabilidade no tempo até ao evento.
+
+#### Boxplot de OS_MONTHS
+
+O boxplot evidencia uma mediana relativamente baixa e uma elevada presença de
+outliers superiores, correspondentes a pacientes com longos tempos de sobrevivência. A
+amplitude interquartil é reduzida comparativamente à extensão total dos dados,
+reforçando a assimetria positiva da distribuição. Estes resultados sugerem
+heterogeneidade clínica significativa na sobrevivência dos pacientes.
+
+#### Distribuição do Aneuploidy Score
+
+A distribuição do Aneuploidy Score apresenta uma forma aproximadamente unimodal,
+com dispersão moderada e ligeira assimetria. Os valores distribuem-se maioritariamente
+entre níveis intermédios, sugerindo variabilidade na instabilidade cromossómica entre
+os pacientes. A ausência de caudas extremas indica menor presença de outliers
+comparativamente a outras variáveis moleculares.
+
+#### Boxplot do Aneuploidy Score
+
+O boxplot revela uma mediana central com intervalo interquartil relativamente amplo,
+indicando variabilidade considerável entre amostras. A distribuição apresenta ligeira
+assimetria e alguns valores extremos, sugerindo heterogeneidade biológica no grau de
+instabilidade cromossómica.
+
+#### Distribuição da TMB
+
+A distribuição da carga mutacional tumoral (TMB) é fortemente assimétrica à direita,
+com elevada concentração de valores baixos e presença de uma cauda longa. Este
+padrão é consistente com dados genómicos, onde a maioria dos tumores apresenta baixa
+carga mutacional, enquanto um subconjunto reduzido apresenta valores elevados.
+
+#### Boxplot da TMB
+
+O boxplot confirma a assimetria positiva da distribuição, com múltiplos outliers
+superiores representando amostras com elevada carga mutacional. A mediana situa-se
+em valores baixos, enquanto a dispersão superior é significativamente maior do que a
+inferior, refletindo heterogeneidade entre pacientes.
+
+#### Distribuição da MSI_SCORE_MANTIS
+
+A variável MSI_SCORE_MANTIS apresenta uma distribuição concentrada num
+intervalo estreito, com ligeira assimetria à direita e presença de poucos valores
+extremos. A maioria das observações situa-se em torno de valores próximos, sugerindo
+baixa variabilidade global nesta métrica.
+
+#### Boxplot da MSI_SCORE_MANTIS
+
+O boxplot evidencia uma distribuição compacta, com mediana central e reduzida
+amplitude interquartil. A presença de alguns outliers superiores indica a existência de
+casos com maior instabilidade, embora estes sejam pouco frequentes.
+
+#### Idade vs TMB
+
+A análise de dispersão entre idade e TMB não revela uma relação linear evidente entre
+as variáveis. Os pontos encontram-se dispersos ao longo do eixo da idade, com
+variabilidade de TMB em praticamente todas as faixas etárias. Este padrão sugere
+ausência de correlação forte, indicando que a carga mutacional não depende diretamente
+da idade nesta coorte.
+
+#### Idade vs MSI_SCORE_MANTIS
+
+A relação entre idade e MSI_SCORE_MANTIS não apresenta tendência linear clara. A
+distribuição dos pontos indica independência entre as variáveis, com valores de MSI
+relativamente constantes ao longo das diferentes idades, sugerindo ausência de
+associação significativa.
+
+#### TMB vs Estádio
+
+A comparação da TMB entre diferentes estádios tumorais revela variação na
+distribuição dos valores, com tendência para maior dispersão em alguns estádios
+intermédios e avançados. Embora as medianas não apresentem diferenças abruptas entre
+grupos, a presença de outliers sugere heterogeneidade intra-estádio.
+
+#### TMB vs Sexo
+
+A distribuição da TMB por sexo revela padrões semelhantes entre os grupos masculino
+e feminino, com medianas próximas e amplitudes interquartis comparáveis. Ambos os
+grupos apresentam outliers superiores, indicando presença de indivíduos com elevada
+carga mutacional. Globalmente, não se observam diferenças substanciais entre sexos.
+
+#### PCA dos dados de expressão
+
+A análise de componentes principais (PCA) evidencia que os dois primeiros
+componentes (PC1 e PC2) explicam uma proporção limitada da variabilidade total
+(≈10.3% e 6.2%, respetivamente). A projeção das amostras não revela separação clara
+entre os grupos etários, sugerindo ausência de estrutura dominante associada à idade nos
+dados de expressão génica. A dispersão homogénea dos pontos indica elevada
+complexidade e dimensionalidade dos dados, sendo provável que a variabilidade esteja
+distribuída por múltiplos componentes.
 
 ## Análise estatística e expressão diferencial
 
 ```{r}
 source("../scripts/06_statistical_analysis.R")
 ```
-```{r}
-source("../scripts/bb.R")
-```
+#### Volcano plot: Idoso vs Jovem
+
+Observa-se uma distribuição simétrica em torno do zero, indicando a presença de genes
+tanto sobre-expressos como sub-expressos entre os grupos analisados (idosos vs
+jovens). Os pontos destacados a vermelho correspondem a genes diferencialmente
+expressos, evidenciando um conjunto relevante de alterações transcricionais associadas
+à idade. A dispersão vertical destes genes indica diferentes níveis de significância
+estatística, sendo que valores mais elevados refletem maior robustez na diferença
+observada.
+
+#### Heatmap dos dados de expressão
+
+Os dados foram organizados com base em clustering hierárquico, tanto ao nível das
+amostras como dos genes, permitindo identificar grupos com perfis de expressão
+semelhantes. De forma geral, não se observam agrupamentos bem definidos das
+amostras, sugerindo a ausência de uma separação clara entre os grupos em estudo com
+base no perfil global de expressão génica. Este resultado indica que as diferenças entre
+os grupos são subtis e não dominam a variabilidade total dos dados. Por outro lado,
+verifica-se algum agrupamento ao nível dos genes, sugerindo a presença de conjuntos
+de genes com padrões de expressão semelhantes, possivelmente associados a vias
+biológicas específicas ou mecanismos regulatórios comuns. Adicionalmente, observa-se
+uma elevada heterogeneidade entre as amostras, característica frequentemente associada
+a dados de tumores, refletindo a complexidade biológica e a variabilidade
+interindividual. No seu conjunto, estes resultados sugerem que, embora existam
+diferenças de expressão génica entre os grupos analisados, estas não são suficientemente
+marcantes para gerar uma separação global clara, sendo mais evidentes ao nível de
+genes ou vias específicas.
+
+## Interpretação biológica
+
 ```{r}
 source("../scripts/07_enrichment_analysis.R")
 ```
 
+#### KEGG – Ciclo celular
 
-```{r}
-table(sign(deg$logFC))
-```
+A análise integrada dos resultados de expressão diferencial e do enrichment funcional
+revela que os genes associados ao ciclo celular se encontram predominantemente
+downregulated (cor verde) no grupo dos indivíduos mais idosos. Considerando o contraste definido
+(Idoso vs Jovem), esta observação indica que estes genes apresentam maior expressão
+nos indivíduos mais jovens. Este padrão é consistente com a hipótese de que tumores
+em pacientes mais jovens apresentam uma maior atividade proliferativa, refletida na
+ativação de processos associados ao ciclo celular. Por outro lado, a menor expressão
+destes genes em pacientes idosos pode estar relacionada com mecanismos de
+senescência celular ou com uma menor taxa de divisão celular. Os resultados do volcano
+plot corroboram esta interpretação, evidenciando a presença de genes significativamente
+diferencialmente expressos com valores negativos de logFC, correspondentes a maior
+expressão no grupo jovem.
+(os mapas biológicos encontram-se na pasta reports)
 
+## Conclusão
 
+A análise descritiva revelou predominância de estádios tumorais iniciais e distribuição
+equilibrada entre sexos.
+As variáveis moleculares apresentaram padrões distintos, sem associações lineares
+fortes com idade ou sexo.
+A expressão génica evidenciou ausência de separação global entre grupos etários,
+indicando diferenças subtis. Ainda assim, a análise diferencial identificou genes
+significativamente alterados.
+A análise de enriquecimento funcional revelou diminuição da atividade do ciclo celular
+em indivíduos mais idosos, sugerindo menor proliferação tumoral, possivelmente
+associada a senescência ou menor agressividade. Globalmente, as diferenças associadas
+à idade são específicas a genes e vias, refletindo a complexidade e heterogeneidade do
+cancro.
